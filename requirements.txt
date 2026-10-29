@@ -1,0 +1,36 @@
+# 核心框架
+deepagents>=0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+
+# 模型接入（按需保留其一）
+langchain-openai>=0.2.0
+# langchain-anthropic>=0.2.0
+
+# 工具依赖
+tavily-python>=0.5.0
+sqlalchemy>=2.0.0
+pymysql>=1.1.0
+requests>=2.32.0
+
+# 文档生成与解析
+markdown>=3.6
+pypdf>=4.0
+python-docx>=1.1
+openpyxl>=3.1
+
+# PDF 导出（任选其一，至少装一个）
+# weasyprint>=62.0
+# pypandoc>=1.13
+
+# 服务与配置
+python-dotenv>=1.0.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+websockets>=12.0
+python-multipart>=0.0.9
+
+# 测试
+pytest>=8.0
+（内容由AI生成，仅供参考）
+（内容由AI生成，仅供参考）

@@ -1,0 +1,28 @@
+# 演示用 MySQL：一键起一个隔离的业务库，自动建表 + 灌样例数据 + 建只读账号
+#   docker compose -f docker-compose.demo.yml up -d
+#   连接串：mysql+pymysql://readonly:demo_readonly_2024@127.0.0.1:23306/cps_demo
+# 端口说明：23306 为验证过的可用端口。若映射失败，先用 `ss -lnt | grep :端口` 确认宿主/WSL 是否已占用（WSL2 的 localhost 转发会抢占 3307/13307 这类端口，表现为连上了别处的 MySQL 并报 Access denied）。
+# 说明：不挂数据卷，容器删除即清空，用于演示与联调，不承载任何真实数据。
+services:
+  mysql-demo:
+    image: mysql:8.0
+    container_name: ds-agent-demo-mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: demo_root_2024
+      MYSQL_DATABASE: cps_demo
+      TZ: Asia/Shanghai
+    ports:
+      - "127.0.0.1:23306:3306"
+    volumes:
+      # 目录内脚本按文件名顺序执行：00_init_readonly_user.sql -> db.sql -> seed.sql
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pdemo_root_2024 --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    restart: "no"

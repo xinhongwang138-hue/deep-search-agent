@@ -1,0 +1,58 @@
+# 数据库语义说明：随 sql/db.sql 一起维护，供数据库子智能体与文档生成参考
+database: cps_demo
+engine: mysql8
+charset: utf8mb4
+
+tables:
+  drugs:
+    comment: 药品基础信息
+    primary_key: drug_id
+    columns:
+      drug_id: {type: varchar(16), comment: 药品编码}
+      drug_name: {type: varchar(64), comment: 商品名}
+      generic_name: {type: varchar(64), comment: 通用名}
+      category: {type: varchar(32), comment: 品类}
+      spec: {type: varchar(64), comment: 规格}
+      manufacturer: {type: varchar(64), comment: 生产企业}
+      approval_no: {type: varchar(32), comment: 批准文号}
+      unit_price: {type: decimal(10,2), comment: 含税单价}
+      is_prescription: {type: tinyint, comment: 是否处方药}
+      status: {type: varchar(16), comment: 在售/停售}
+      created_at: {type: date, comment: 建档日期}
+
+  inventory:
+    comment: 库存快照（按仓库 + 批号）
+    primary_key: inventory_id
+    joins:
+      - "inventory.drug_id = drugs.drug_id"
+    columns:
+      inventory_id: {type: bigint, comment: 库存流水号}
+      drug_id: {type: varchar(16), comment: 药品编码}
+      warehouse: {type: varchar(32), comment: 仓库}
+      batch_no: {type: varchar(32), comment: 批号}
+      quantity: {type: int, comment: 在库数量}
+      safety_stock: {type: int, comment: 安全库存下限}
+      expiry_date: {type: date, comment: 有效期至}
+      updated_at: {type: datetime, comment: 最近更新时间}
+
+  sales_orders:
+    comment: 销售流水
+    primary_key: order_id
+    joins:
+      - "sales_orders.drug_id = drugs.drug_id"
+    columns:
+      order_id: {type: bigint, comment: 订单号}
+      drug_id: {type: varchar(16), comment: 药品编码}
+      customer_type: {type: varchar(16), comment: 医院/连锁药房/经销商/电商}
+      region: {type: varchar(16), comment: 华东/华南/华北/西南}
+      quantity: {type: int, comment: 销售数量}
+      unit_price: {type: decimal(10,2), comment: 成交单价}
+      amount: {type: decimal(12,2), comment: 成交金额}
+      order_date: {type: date, comment: 下单日期}
+      salesperson: {type: varchar(16), comment: 业务员}
+
+metrics:
+  gmv: "SUM(sales_orders.amount)"
+  sales_qty: "SUM(sales_orders.quantity)"
+  avg_price: "SUM(amount) / SUM(quantity)"
+  stock_gap: "SUM(inventory.quantity) - SUM(inventory.safety_stock)"
