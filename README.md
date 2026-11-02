@@ -1,16 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 2ef7930562d418b0a12963f90da05d53_faf21d1ed34011f1a301525400cd780f
-    ReservedCode1: o9qJ3mOu77OwiONabVoH5nrNSDSxrh6MB42bNS5c/oQ/WUN2xUNbPHXiID0FQ5PZh2Ui1Mz0fbGEX8pmLfXx+MM/K5q4u9fD4QExj3dIhtTGn93NcHePsKeTInjFqIKxJWAt502xyMr3x5b6HFw9F/a8IwhOMoiq5+PPxYvdS4RjbcmbGj1Y3wRd2PY=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 2ef7930562d418b0a12963f90da05d53_faf21d1ed34011f1a301525400cd780f
-    ReservedCode2: o9qJ3mOu77OwiONabVoH5nrNSDSxrh6MB42bNS5c/oQ/WUN2xUNbPHXiID0FQ5PZh2Ui1Mz0fbGEX8pmLfXx+MM/K5q4u9fD4QExj3dIhtTGn93NcHePsKeTInjFqIKxJWAt502xyMr3x5b6HFw9F/a8IwhOMoiq5+PPxYvdS4RjbcmbGj1Y3wRd2PY=
----
-
-
-
 # Deep Search Agent（deepagents 深度搜索框架）
 
 基于 `deepagents` 的"主智能体 + 三路检索子智能体"深度搜索框架，提示词方案见配套文档 `deepagents-multi-agent-prompts.md`。
@@ -246,3 +233,20 @@ mysql -u root -p cps_demo < sql/seed.sql
 4. 初始化数据中文乱码：`sql/db.sql`、`sql/seed.sql` 缺 `SET NAMES utf8mb4` 时，中文字面量会按 latin1 双写进库（`HEX(drug_name)` 出现 `C3A5C2B8` 类字节），读出来是 `å¸ƒæ´›èŠ¬`。已在两个脚本开头补 `SET NAMES utf8mb4`，同时在 `tools/sql_tools.py` 的 engine 上强制 `charset=utf8mb4`，双层兜底。
 
 *（内容由AI生成，仅供参考）*
+
+---
+
+## 附：AIGC 内容标识
+
+本仓库文档由 AI 辅助生成，按《人工智能生成合成内容标识办法》保留以下标识：
+
+```yaml
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 2ef7930562d418b0a12963f90da05d53_faf21d1ed34011f1a301525400cd780f
+    ReservedCode1: o9qJ3mOu77OwiONabVoH5nrNSDSxrh6MB42bNS5c/oQ/WUN2xUNbPHXiID0FQ5PZh2Ui1Mz0fbGEX8pmLfXx+MM/K5q4u9fD4QExj3dIhtTGn93NcHePsKeTInjFqIKxJWAt502xyMr3x5b6HFw9F/a8IwhOMoiq5+PPxYvdS4RjbcmbGj1Y3wRd2PY=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 2ef7930562d418b0a12963f90da05d53_faf21d1ed34011f1a301525400cd780f
+    ReservedCode2: o9qJ3mOu77OwiONabVoH5nrNSDSxrh6MB42bNS5c/oQ/WUN2xUNbPHXiID0FQ5PZh2Ui1Mz0fbGEX8pmLfXx+MM/K5q4u9fD4QExj3dIhtTGn93NcHePsKeTInjFqIKxJWAt502xyMr3x5b6HFw9F/a8IwhOMoiq5+PPxYvdS4RjbcmbGj1Y3wRd2PY=
+```
