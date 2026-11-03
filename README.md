@@ -39,7 +39,7 @@ deep-search-agent/
 ├── ui/                            # Vue3 + Vite 前端
 │   ├── src/App.vue                # 执行轨迹 / 产物列表 / 上传下载
 │   ├── src/api.ts                 # 接口封装
-│   └── vite.config.ts             # /api、/ws 代理到 8000
+│   └── vite.config.ts             # /api、/ws 代理到 8000（DS_AGENT_API_PORT 可覆盖）
 ├── sql/
 │   ├── db.sql                     # 建表：drugs / inventory / sales_orders
 │   ├── seed.sql                   # 示例数据（10 药品 / 22 库存 / 56 流水）
@@ -101,8 +101,14 @@ python main.py
 ```bash
 cd ui
 npm install
-npm run dev          # http://localhost:5173，/api 与 /ws 自动代理到 8000
+npm run dev          # http://127.0.0.1:5173，/api 与 /ws 自动代理到 8000
 npm run build        # 产物在 ui/dist，可直接挂到 nginx
+```
+
+后端换端口时，前端要跟着指过去（`vite.config.ts` 读这个环境变量，默认 8000）：
+
+```bash
+DS_AGENT_API_PORT=8002 npm run dev
 ```
 
 数据库示例（MySQL 8）：
@@ -225,12 +231,13 @@ mysql -u root -p cps_demo < sql/seed.sql
 - ~~MySQL 实库~~：已用 `docker-compose.demo.yml` 起独立演示库完成验证（见上表），无需本机 MySQL80；接自己的库时把只读账号写入 `.env` 的 `DS_AGENT_DB_URL` 即可。
 - Tavily 检索与 RAGFlow 知识库：需各自 `TAVILY_API_KEY` 与 RAGFlow 服务地址、key。
 
-四个环境坑（本机已遇到并规避）：
+五个环境坑（本机已遇到并规避）：
 
-1. 8000 端口可能被其它服务占用（`bind` 报 `WinError 10048`），用 `DS_AGENT_PORT` 换端口即可。
-2. `uv sync` 若报 “virtual environment directory ... is not a valid Python environment”，是 uv 下载托管 CPython 失败所致；改用系统解释器重建：`uv venv --force --clear --python "C:\Program Files\Python312\python.exe"`，再 `uv sync`。
-3. 容器端口映射“假成功”：Docker 显示 `127.0.0.1:3307->3306/tcp`，但 WSL2 的 localhost 转发已抢占 3307/13307，实际连到的是 WSL 里的另一个 MySQL，报 `Access denied`（客户端 IP 显示 `172.21.0.1` 即为信号）。先用 `wsl -d Ubuntu -u root -- ss -lnt | grep :端口` 确认未被占用，再选 23306 这类冷门端口；连接必须写 `127.0.0.1`，写 `localhost` 可能解析到 `::1` 而走错通道。
-4. 初始化数据中文乱码：`sql/db.sql`、`sql/seed.sql` 缺 `SET NAMES utf8mb4` 时，中文字面量会按 latin1 双写进库（`HEX(drug_name)` 出现 `C3A5C2B8` 类字节），读出来是 `å¸ƒæ´›èŠ¬`。已在两个脚本开头补 `SET NAMES utf8mb4`，同时在 `tools/sql_tools.py` 的 engine 上强制 `charset=utf8mb4`，双层兜底。
+1. 8000 端口可能被其它服务占用（`bind` 报 `WinError 10048`），用 `DS_AGENT_PORT` 换端口即可。**换端口后前端也要跟着换**：启动前设 `DS_AGENT_API_PORT=<同一端口>`，否则 vite 仍代理到 8000，前端右上角会显示「连接中断」。另外 `netstat` 里查不到占用者、但 bind 一定失败时，是 Windows 上被隐藏占用的端口（实测 `netstat`、`Get-NetTCPConnection`、`netsh http show urlacl` 全都查不到），不必继续找，直接换端口。
+2. vite 默认只监听 IPv6 回环（`[::1]:5173`），用 `http://127.0.0.1:5173` 访问会直接连不上。`vite.config.ts` 里已写死 `server.host = '127.0.0.1'`，两个协议都通。
+3. `uv sync` 若报 “virtual environment directory ... is not a valid Python environment”，是 uv 下载托管 CPython 失败所致；改用系统解释器重建：`uv venv --force --clear --python "C:\Program Files\Python312\python.exe"`，再 `uv sync`。
+4. 容器端口映射“假成功”：Docker 显示 `127.0.0.1:3307->3306/tcp`，但 WSL2 的 localhost 转发已抢占 3307/13307，实际连到的是 WSL 里的另一个 MySQL，报 `Access denied`（客户端 IP 显示 `172.21.0.1` 即为信号）。先用 `wsl -d Ubuntu -u root -- ss -lnt | grep :端口` 确认未被占用，再选 23306 这类冷门端口；连接必须写 `127.0.0.1`，写 `localhost` 可能解析到 `::1` 而走错通道。
+5. 初始化数据中文乱码：`sql/db.sql`、`sql/seed.sql` 缺 `SET NAMES utf8mb4` 时，中文字面量会按 latin1 双写进库（`HEX(drug_name)` 出现 `C3A5C2B8` 类字节），读出来是 `å¸ƒæ´›èŠ¬`。已在两个脚本开头补 `SET NAMES utf8mb4`，同时在 `tools/sql_tools.py` 的 engine 上强制 `charset=utf8mb4`，双层兜底。
 
 *（内容由AI生成，仅供参考）*
 
