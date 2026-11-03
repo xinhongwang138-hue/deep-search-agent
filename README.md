@@ -243,6 +243,14 @@ mysql -u root -p cps_demo < sql/seed.sql
 
 ---
 
+## 十三、许可
+
+采用 [MIT 许可证](LICENSE)。可自由使用、修改、再分发（含商用），需保留原版权声明与许可声明；作者不提供任何担保。
+
+依赖组件各自遵循其上游许可证（DeepAgents、LangChain、FastAPI、Vue 3、Vite 等），本仓库许可证不覆盖第三方代码。
+
+---
+
 ## 附：AIGC 内容标识
 
 本仓库文档由 AI 辅助生成，按《人工智能生成合成内容标识办法》保留以下标识：
