@@ -233,7 +233,7 @@ mysql -u root -p cps_demo < sql/seed.sql
 
 五个环境坑（本机已遇到并规避）：
 
-1. 8000 端口可能被其它服务占用（`bind` 报 `WinError 10048`），用 `DS_AGENT_PORT` 换端口即可。**换端口后前端也要跟着换**：启动前设 `DS_AGENT_API_PORT=<同一端口>`，否则 vite 仍代理到 8000，前端右上角会显示「连接中断」。另外 `netstat` 里查不到占用者、但 bind 一定失败时，是 Windows 上被隐藏占用的端口（实测 `netstat`、`Get-NetTCPConnection`、`netsh http show urlacl` 全都查不到），不必继续找，直接换端口。
+1. 8000 端口可能被其它服务占用（`bind` 报 `WinError 10048`），用 `DS_AGENT_PORT` 换端口即可。**换端口后前端也要跟着换**：启动前设 `DS_AGENT_API_PORT=<同一端口>`，否则 vite 仍代理到 8000，前端右上角会显示「连接中断」。另外 **`netstat` 查不到占用者、但 bind 一定失败时，先看容器**：Docker 的端口转发在 `netstat`、`Get-NetTCPConnection`、`netsh http show urlacl` 里全都看不见，`docker ps --format "{{.Ports}}"` 却能一眼看到（本机实测是 attu 容器占了 `127.0.0.1:8000->3000`）；确认没有容器占用，再换端口。
 2. vite 默认只监听 IPv6 回环（`[::1]:5173`），用 `http://127.0.0.1:5173` 访问会直接连不上。`vite.config.ts` 里已写死 `server.host = '127.0.0.1'`，两个协议都通。
 3. `uv sync` 若报 “virtual environment directory ... is not a valid Python environment”，是 uv 下载托管 CPython 失败所致；改用系统解释器重建：`uv venv --force --clear --python "C:\Program Files\Python312\python.exe"`，再 `uv sync`。
 4. 容器端口映射“假成功”：Docker 显示 `127.0.0.1:3307->3306/tcp`，但 WSL2 的 localhost 转发已抢占 3307/13307，实际连到的是 WSL 里的另一个 MySQL，报 `Access denied`（客户端 IP 显示 `172.21.0.1` 即为信号）。先用 `wsl -d Ubuntu -u root -- ss -lnt | grep :端口` 确认未被占用，再选 23306 这类冷门端口；连接必须写 `127.0.0.1`，写 `localhost` 可能解析到 `::1` 而走错通道。
