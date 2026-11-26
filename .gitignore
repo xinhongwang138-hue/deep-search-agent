@@ -1,0 +1,20 @@
+# 环境与凭据
+.env
+.venv/
+venv/
+
+# 运行产出
+workspaces/
+*.pyc
+__pycache__/
+.pytest_cache/
+*.log
+
+# 编辑器
+.idea/
+.vscode/
+
+# 前端
+ui/node_modules/
+ui/dist/
+ui/.vite/

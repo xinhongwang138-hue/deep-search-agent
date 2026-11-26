@@ -1,0 +1,39 @@
+[project]
+name = "deep-search-agent"
+version = "1.0.0"
+description = "基于 DeepAgents 的企业级深度搜索框架：主智能体 + 三路检索子智能体 + 执行层防护"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "deepagents>=0.2.0",
+  "langchain>=0.3.0",
+  "langchain-core>=0.3.0",
+  "langchain-openai>=0.2.0",
+  "tavily-python>=0.5.0",
+  "sqlalchemy>=2.0.0",
+  "pymysql>=1.1.0",
+  "requests>=2.32.0",
+  "markdown>=3.6",
+  "pypdf>=4.0",
+  "python-docx>=1.1",
+  "openpyxl>=3.1",
+  "python-dotenv>=1.0.0",
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "websockets>=12.0",
+  "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+pdf = ["weasyprint>=62.0"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+deep-search = "main:main"
+
+[tool.uv]
+# 脚本式工程：不打包安装自身，只管理依赖
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
