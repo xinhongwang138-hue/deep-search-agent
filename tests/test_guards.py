@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -59,5 +60,8 @@ def test_workspace_blocks_traversal() -> None:
     with pytest.raises(WorkspaceViolation):
         resolve_in_workspace("../../etc/passwd")
 
-    with pytest.raises(WorkspaceViolation):
-        resolve_in_workspace("C:/Windows/system32/drivers/etc/hosts")
+    # 越界样本必须在任何平台上都真的在目录外：写死 "C:/Windows/..." 时
+    # Linux 会把它当普通相对名落回 workspace 内，守卫等于没被验证过。
+    for outside in (Path(sys.executable), Path(tempfile.gettempdir()) / "ds_guard_probe"):
+        with pytest.raises(WorkspaceViolation):
+            resolve_in_workspace(str(outside))
